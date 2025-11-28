@@ -58,6 +58,10 @@
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
+            -webkit-tap-highlight-color: rgba(0, 212, 255, 0.3);
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         .checkbox-item:hover, .level-item:hover {
@@ -365,21 +369,21 @@
             <div class="section">
                 <div class="section-title">📚 Choisir le(s) niveau(x)</div>
                 <div class="level-group" id="level-selection">
-                    <div class="level-item" data-level="A1">A1</div>
-                    <div class="level-item" data-level="A2">A2</div>
-                    <div class="level-item" data-level="B1">B1</div>
-                    <div class="level-item" data-level="B2">B2</div>
-                    <div class="level-item" data-level="C1">C1</div>
+                    <div class="level-item" data-level="A1" onclick="">A1</div>
+                    <div class="level-item" data-level="A2" onclick="">A2</div>
+                    <div class="level-item" data-level="B1" onclick="">B1</div>
+                    <div class="level-item" data-level="B2" onclick="">B2</div>
+                    <div class="level-item" data-level="C1" onclick="">C1</div>
                 </div>
             </div>
             
             <div class="section">
                 <div class="section-title">🎯 Que devez-vous trouver ? (max 3)</div>
                 <div class="checkbox-group" id="answer-selection">
-                    <div class="checkbox-item" data-field="infinitif">Infinitif</div>
-                    <div class="checkbox-item" data-field="preterit">Prétérit (P1)</div>
-                    <div class="checkbox-item" data-field="participe">Participe (P2)</div>
-                    <div class="checkbox-item" data-field="traduction">Traduction</div>
+                    <div class="checkbox-item" data-field="infinitif" onclick="">Infinitif</div>
+                    <div class="checkbox-item" data-field="preterit" onclick="">Prétérit (P1)</div>
+                    <div class="checkbox-item" data-field="participe" onclick="">Participe (P2)</div>
+                    <div class="checkbox-item" data-field="traduction" onclick="">Traduction</div>
                 </div>
             </div>
             
@@ -630,15 +634,25 @@
 
         // Load stats from localStorage
         function loadStats() {
-            const saved = localStorage.getItem('germanVerbStats');
-            if (saved) {
-                state.verbStats = JSON.parse(saved);
+            try {
+                const saved = localStorage.getItem('germanVerbStats');
+                if (saved) {
+                    state.verbStats = JSON.parse(saved);
+                }
+            } catch (e) {
+                // localStorage may be unavailable in private browsing mode on iOS Safari
+                console.warn('localStorage not available:', e);
             }
         }
 
         // Save stats to localStorage
         function saveStats() {
-            localStorage.setItem('germanVerbStats', JSON.stringify(state.verbStats));
+            try {
+                localStorage.setItem('germanVerbStats', JSON.stringify(state.verbStats));
+            } catch (e) {
+                // localStorage may be unavailable in private browsing mode on iOS Safari
+                console.warn('localStorage not available:', e);
+            }
         }
 
         // Initialize verb stats if not exists
