@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - Verbes Irréguliers Allemands</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 10px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            color: #ffd700;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .section-title {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            color: #00d4ff;
+        }
+        
+        .checkbox-group, .level-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .checkbox-item, .level-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .checkbox-item:hover, .level-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .checkbox-item.selected, .level-item.selected {
+            background: #00d4ff;
+            color: #1a1a2e;
+        }
+        
+        .checkbox-item.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff6b6b 0%, #cc5555 100%);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4ecdc4 0%, #3db3ab 100%);
+        }
+        
+        #quiz-area {
+            display: none;
+        }
+        
+        .quiz-question {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .verb-display {
+            font-size: 1.3em;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+        }
+        
+        .verb-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .verb-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .verb-item.hidden-answer {
+            background: rgba(255, 107, 107, 0.3);
+            border: 2px dashed #ff6b6b;
+        }
+        
+        .verb-label {
+            font-size: 0.8em;
+            color: #00d4ff;
+            margin-bottom: 5px;
+        }
+        
+        .verb-value {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        
+        .answer-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .answer-input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+        
+        .answer-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .answer-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .input-label {
+            font-size: 0.9em;
+            color: #00d4ff;
+        }
+        
+        .feedback {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        
+        .feedback.correct {
+            background: rgba(78, 205, 196, 0.3);
+            color: #4ecdc4;
+        }
+        
+        .feedback.incorrect {
+            background: rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+        }
+        
+        .stats-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            text-align: center;
+        }
+        
+        .stat-item {
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .stat-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .stat-label {
+            font-size: 0.8em;
+            color: #aaa;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b6b, #ffd700, #4ecdc4);
+            border-radius: 5px;
+            transition: width 0.3s;
+        }
+        
+        .verb-stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        
+        .verb-stats-table th,
+        .verb-stats-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .verb-stats-table th {
+            color: #00d4ff;
+            font-weight: normal;
+        }
+        
+        .success-rate {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+        }
+        
+        .success-rate.high {
+            background: rgba(78, 205, 196, 0.3);
+            color: #4ecdc4;
+        }
+        
+        .success-rate.medium {
+            background: rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+        }
+        
+        .success-rate.low {
+            background: rgba(255, 107, 107, 0.3);
+            color: #ff6b6b;
+        }
+        
+        #stats-area {
+            display: none;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: #00d4ff;
+            color: #1a1a2e;
+        }
+        
+        .correct-answer {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .correct-answer-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+        
+        .your-answer {
+            color: #ff6b6b;
+            text-decoration: line-through;
+        }
+        
+        .right-answer {
+            color: #4ecdc4;
+        }
+        
+        @media (max-width: 400px) {
+            .verb-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🇩🇪 Verbes Irréguliers Allemands</h1>
+        
+        <!-- Configuration Area -->
+        <div id="config-area">
+            <div class="section">
+                <div class="section-title">📚 Choisir le(s) niveau(x)</div>
+                <div class="level-group" id="level-selection">
+                    <div class="level-item" data-level="A1">A1</div>
+                    <div class="level-item" data-level="A2">A2</div>
+                    <div class="level-item" data-level="B1">B1</div>
+                    <div class="level-item" data-level="B2">B2</div>
+                    <div class="level-item" data-level="C1">C1</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">🎯 Que devez-vous trouver ? (max 3)</div>
+                <div class="checkbox-group" id="answer-selection">
+                    <div class="checkbox-item" data-field="infinitif">Infinitif</div>
+                    <div class="checkbox-item" data-field="preterit">Prétérit (P1)</div>
+                    <div class="checkbox-item" data-field="participe">Participe (P2)</div>
+                    <div class="checkbox-item" data-field="traduction">Traduction</div>
+                </div>
+            </div>
+            
+            <button class="btn" id="start-btn" disabled>Commencer le Quiz</button>
+            <button class="btn btn-secondary" id="stats-btn">📊 Voir les Statistiques</button>
+            <button class="btn btn-secondary" id="reset-stats-btn">🗑️ Réinitialiser les Stats</button>
+        </div>
+        
+        <!-- Quiz Area -->
+        <div id="quiz-area">
+            <div class="stats-panel">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="current-score">0</div>
+                        <div class="stat-label">Correct</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="current-total">0</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="current-percent">0%</div>
+                        <div class="stat-label">Réussite</div>
+                    </div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div class="section quiz-question">
+                <div class="verb-display" id="verb-display"></div>
+                <div class="verb-info" id="verb-info"></div>
+                <div class="answer-inputs" id="answer-inputs"></div>
+                <div class="feedback" id="feedback" style="display: none;"></div>
+                <div class="correct-answer" id="correct-answer" style="display: none;"></div>
+            </div>
+            
+            <button class="btn btn-success" id="validate-btn">Valider</button>
+            <button class="btn" id="next-btn" style="display: none;">Suivant</button>
+            <button class="btn btn-secondary" id="quit-btn">Quitter</button>
+        </div>
+        
+        <!-- Statistics Area -->
+        <div id="stats-area">
+            <div class="section">
+                <div class="section-title">📊 Statistiques Globales</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="global-seen">0</div>
+                        <div class="stat-label">Verbes vus</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="global-correct">0</div>
+                        <div class="stat-label">Correct</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="global-percent">0%</div>
+                        <div class="stat-label">Réussite</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">📖 Détails par verbe</div>
+                <div class="tabs" id="level-tabs"></div>
+                <div id="verb-stats-container"></div>
+            </div>
+            
+            <button class="btn btn-secondary" id="back-btn">Retour</button>
+        </div>
+    </div>
+
+    <script>
+        // German irregular verbs database organized by level
+        const verbsDatabase = {
+            A1: [
+                { infinitif: "sein", preterit: "war", participe: "gewesen", traduction: "être" },
+                { infinitif: "haben", preterit: "hatte", participe: "gehabt", traduction: "avoir" },
+                { infinitif: "werden", preterit: "wurde", participe: "geworden", traduction: "devenir" },
+                { infinitif: "können", preterit: "konnte", participe: "gekonnt", traduction: "pouvoir" },
+                { infinitif: "müssen", preterit: "musste", participe: "gemusst", traduction: "devoir" },
+                { infinitif: "wollen", preterit: "wollte", participe: "gewollt", traduction: "vouloir" },
+                { infinitif: "sollen", preterit: "sollte", participe: "gesollt", traduction: "devoir (obligation)" },
+                { infinitif: "dürfen", preterit: "durfte", participe: "gedurft", traduction: "avoir le droit" },
+                { infinitif: "mögen", preterit: "mochte", participe: "gemocht", traduction: "aimer bien" },
+                { infinitif: "wissen", preterit: "wusste", participe: "gewusst", traduction: "savoir" },
+                { infinitif: "gehen", preterit: "ging", participe: "gegangen", traduction: "aller" },
+                { infinitif: "kommen", preterit: "kam", participe: "gekommen", traduction: "venir" },
+                { infinitif: "sehen", preterit: "sah", participe: "gesehen", traduction: "voir" },
+                { infinitif: "geben", preterit: "gab", participe: "gegeben", traduction: "donner" },
+                { infinitif: "nehmen", preterit: "nahm", participe: "genommen", traduction: "prendre" },
+                { infinitif: "finden", preterit: "fand", participe: "gefunden", traduction: "trouver" },
+                { infinitif: "denken", preterit: "dachte", participe: "gedacht", traduction: "penser" },
+                { infinitif: "sprechen", preterit: "sprach", participe: "gesprochen", traduction: "parler" },
+                { infinitif: "halten", preterit: "hielt", participe: "gehalten", traduction: "tenir" },
+                { infinitif: "bringen", preterit: "brachte", participe: "gebracht", traduction: "apporter" },
+                { infinitif: "schlafen", preterit: "schlief", participe: "geschlafen", traduction: "dormir" },
+                { infinitif: "essen", preterit: "aß", participe: "gegessen", traduction: "manger" },
+                { infinitif: "trinken", preterit: "trank", participe: "getrunken", traduction: "boire" },
+                { infinitif: "lesen", preterit: "las", participe: "gelesen", traduction: "lire" },
+                { infinitif: "schreiben", preterit: "schrieb", participe: "geschrieben", traduction: "écrire" },
+                { infinitif: "fahren", preterit: "fuhr", participe: "gefahren", traduction: "conduire/aller (véhicule)" },
+                { infinitif: "laufen", preterit: "lief", participe: "gelaufen", traduction: "courir" },
+                { infinitif: "stehen", preterit: "stand", participe: "gestanden", traduction: "être debout" },
+                { infinitif: "sitzen", preterit: "saß", participe: "gesessen", traduction: "être assis" },
+                { infinitif: "liegen", preterit: "lag", participe: "gelegen", traduction: "être couché" }
+            ],
+            A2: [
+                { infinitif: "beginnen", preterit: "begann", participe: "begonnen", traduction: "commencer" },
+                { infinitif: "bleiben", preterit: "blieb", participe: "geblieben", traduction: "rester" },
+                { infinitif: "fallen", preterit: "fiel", participe: "gefallen", traduction: "tomber" },
+                { infinitif: "fliegen", preterit: "flog", participe: "geflogen", traduction: "voler" },
+                { infinitif: "helfen", preterit: "half", participe: "geholfen", traduction: "aider" },
+                { infinitif: "kennen", preterit: "kannte", participe: "gekannt", traduction: "connaître" },
+                { infinitif: "lassen", preterit: "ließ", participe: "gelassen", traduction: "laisser" },
+                { infinitif: "nennen", preterit: "nannte", participe: "genannt", traduction: "nommer" },
+                { infinitif: "rufen", preterit: "rief", participe: "gerufen", traduction: "appeler" },
+                { infinitif: "schließen", preterit: "schloss", participe: "geschlossen", traduction: "fermer" },
+                { infinitif: "schwimmen", preterit: "schwamm", participe: "geschwommen", traduction: "nager" },
+                { infinitif: "tragen", preterit: "trug", participe: "getragen", traduction: "porter" },
+                { infinitif: "treffen", preterit: "traf", participe: "getroffen", traduction: "rencontrer" },
+                { infinitif: "vergessen", preterit: "vergaß", participe: "vergessen", traduction: "oublier" },
+                { infinitif: "verlieren", preterit: "verlor", participe: "verloren", traduction: "perdre" },
+                { infinitif: "waschen", preterit: "wusch", participe: "gewaschen", traduction: "laver" },
+                { infinitif: "werfen", preterit: "warf", participe: "geworfen", traduction: "jeter" },
+                { infinitif: "ziehen", preterit: "zog", participe: "gezogen", traduction: "tirer" },
+                { infinitif: "bitten", preterit: "bat", participe: "gebeten", traduction: "demander/prier" },
+                { infinitif: "brechen", preterit: "brach", participe: "gebrochen", traduction: "casser" },
+                { infinitif: "empfehlen", preterit: "empfahl", participe: "empfohlen", traduction: "recommander" },
+                { infinitif: "erschrecken", preterit: "erschrak", participe: "erschrocken", traduction: "effrayer" },
+                { infinitif: "gewinnen", preterit: "gewann", participe: "gewonnen", traduction: "gagner" },
+                { infinitif: "hängen", preterit: "hing", participe: "gehangen", traduction: "être suspendu" },
+                { infinitif: "heißen", preterit: "hieß", participe: "geheißen", traduction: "s'appeler" },
+                { infinitif: "laden", preterit: "lud", participe: "geladen", traduction: "charger" },
+                { infinitif: "riechen", preterit: "roch", participe: "gerochen", traduction: "sentir" },
+                { infinitif: "scheinen", preterit: "schien", participe: "geschienen", traduction: "sembler/briller" },
+                { infinitif: "schneiden", preterit: "schnitt", participe: "geschnitten", traduction: "couper" },
+                { infinitif: "singen", preterit: "sang", participe: "gesungen", traduction: "chanter" }
+            ],
+            B1: [
+                { infinitif: "beißen", preterit: "biss", participe: "gebissen", traduction: "mordre" },
+                { infinitif: "biegen", preterit: "bog", participe: "gebogen", traduction: "courber" },
+                { infinitif: "binden", preterit: "band", participe: "gebunden", traduction: "attacher" },
+                { infinitif: "blasen", preterit: "blies", participe: "geblasen", traduction: "souffler" },
+                { infinitif: "braten", preterit: "briet", participe: "gebraten", traduction: "rôtir" },
+                { infinitif: "dringen", preterit: "drang", participe: "gedrungen", traduction: "pénétrer" },
+                { infinitif: "erscheinen", preterit: "erschien", participe: "erschienen", traduction: "apparaître" },
+                { infinitif: "frieren", preterit: "fror", participe: "gefroren", traduction: "geler" },
+                { infinitif: "gelingen", preterit: "gelang", participe: "gelungen", traduction: "réussir" },
+                { infinitif: "gelten", preterit: "galt", participe: "gegolten", traduction: "valoir" },
+                { infinitif: "genießen", preterit: "genoss", participe: "genossen", traduction: "savourer" },
+                { infinitif: "geschehen", preterit: "geschah", participe: "geschehen", traduction: "arriver/se passer" },
+                { infinitif: "graben", preterit: "grub", participe: "gegraben", traduction: "creuser" },
+                { infinitif: "greifen", preterit: "griff", participe: "gegriffen", traduction: "saisir" },
+                { infinitif: "klingen", preterit: "klang", participe: "geklungen", traduction: "sonner" },
+                { infinitif: "kriechen", preterit: "kroch", participe: "gekrochen", traduction: "ramper" },
+                { infinitif: "leiden", preterit: "litt", participe: "gelitten", traduction: "souffrir" },
+                { infinitif: "leihen", preterit: "lieh", participe: "geliehen", traduction: "prêter" },
+                { infinitif: "meiden", preterit: "mied", participe: "gemieden", traduction: "éviter" },
+                { infinitif: "messen", preterit: "maß", participe: "gemessen", traduction: "mesurer" },
+                { infinitif: "pfeifen", preterit: "pfiff", participe: "gepfiffen", traduction: "siffler" },
+                { infinitif: "raten", preterit: "riet", participe: "geraten", traduction: "conseiller/deviner" },
+                { infinitif: "reiben", preterit: "rieb", participe: "gerieben", traduction: "frotter" },
+                { infinitif: "reißen", preterit: "riss", participe: "gerissen", traduction: "déchirer" },
+                { infinitif: "reiten", preterit: "ritt", participe: "geritten", traduction: "monter à cheval" },
+                { infinitif: "rennen", preterit: "rannte", participe: "gerannt", traduction: "courir vite" },
+                { infinitif: "schaffen", preterit: "schuf", participe: "geschaffen", traduction: "créer" },
+                { infinitif: "scheiden", preterit: "schied", participe: "geschieden", traduction: "séparer" },
+                { infinitif: "schieben", preterit: "schob", participe: "geschoben", traduction: "pousser" },
+                { infinitif: "schießen", preterit: "schoss", participe: "geschossen", traduction: "tirer (arme)" }
+            ],
+            B2: [
+                { infinitif: "schlagen", preterit: "schlug", participe: "geschlagen", traduction: "frapper" },
+                { infinitif: "schleichen", preterit: "schlich", participe: "geschlichen", traduction: "se faufiler" },
+                { infinitif: "schmelzen", preterit: "schmolz", participe: "geschmolzen", traduction: "fondre" },
+                { infinitif: "schweigen", preterit: "schwieg", participe: "geschwiegen", traduction: "se taire" },
+                { infinitif: "schwören", preterit: "schwor", participe: "geschworen", traduction: "jurer" },
+                { infinitif: "sinken", preterit: "sank", participe: "gesunken", traduction: "couler/sombrer" },
+                { infinitif: "spinnen", preterit: "spann", participe: "gesponnen", traduction: "filer" },
+                { infinitif: "springen", preterit: "sprang", participe: "gesprungen", traduction: "sauter" },
+                { infinitif: "stechen", preterit: "stach", participe: "gestochen", traduction: "piquer" },
+                { infinitif: "stehlen", preterit: "stahl", participe: "gestohlen", traduction: "voler (dérober)" },
+                { infinitif: "steigen", preterit: "stieg", participe: "gestiegen", traduction: "monter" },
+                { infinitif: "sterben", preterit: "starb", participe: "gestorben", traduction: "mourir" },
+                { infinitif: "stoßen", preterit: "stieß", participe: "gestoßen", traduction: "pousser/heurter" },
+                { infinitif: "streichen", preterit: "strich", participe: "gestrichen", traduction: "peindre/rayer" },
+                { infinitif: "streiten", preterit: "stritt", participe: "gestritten", traduction: "se disputer" },
+                { infinitif: "treten", preterit: "trat", participe: "getreten", traduction: "marcher/donner un coup de pied" },
+                { infinitif: "trügen", preterit: "trog", participe: "getrogen", traduction: "tromper" },
+                { infinitif: "verderben", preterit: "verdarb", participe: "verdorben", traduction: "gâter/abîmer" },
+                { infinitif: "wachsen", preterit: "wuchs", participe: "gewachsen", traduction: "grandir/pousser" },
+                { infinitif: "weichen", preterit: "wich", participe: "gewichen", traduction: "céder" },
+                { infinitif: "weisen", preterit: "wies", participe: "gewiesen", traduction: "montrer/indiquer" },
+                { infinitif: "wenden", preterit: "wandte", participe: "gewandt", traduction: "tourner" },
+                { infinitif: "wiegen", preterit: "wog", participe: "gewogen", traduction: "peser" },
+                { infinitif: "zwingen", preterit: "zwang", participe: "gezwungen", traduction: "forcer" },
+                { infinitif: "empfinden", preterit: "empfand", participe: "empfunden", traduction: "ressentir" },
+                { infinitif: "entscheiden", preterit: "entschied", participe: "entschieden", traduction: "décider" },
+                { infinitif: "erfahren", preterit: "erfuhr", participe: "erfahren", traduction: "apprendre/expérimenter" },
+                { infinitif: "erfinden", preterit: "erfand", participe: "erfunden", traduction: "inventer" },
+                { infinitif: "ergreifen", preterit: "ergriff", participe: "ergriffen", traduction: "saisir" },
+                { infinitif: "erheben", preterit: "erhob", participe: "erhoben", traduction: "élever" }
+            ],
+            C1: [
+                { infinitif: "erlöschen", preterit: "erlosch", participe: "erloschen", traduction: "s'éteindre" },
+                { infinitif: "erschallen", preterit: "erscholl", participe: "erschollen", traduction: "retentir" },
+                { infinitif: "erwägen", preterit: "erwog", participe: "erwogen", traduction: "considérer" },
+                { infinitif: "gebären", preterit: "gebar", participe: "geboren", traduction: "accoucher" },
+                { infinitif: "gedeihen", preterit: "gedieh", participe: "gediehen", traduction: "prospérer" },
+                { infinitif: "gleichen", preterit: "glich", participe: "geglichen", traduction: "ressembler" },
+                { infinitif: "gleiten", preterit: "glitt", participe: "geglitten", traduction: "glisser" },
+                { infinitif: "klimmen", preterit: "klomm", participe: "geklommen", traduction: "grimper" },
+                { infinitif: "kneifen", preterit: "kniff", participe: "gekniffen", traduction: "pincer" },
+                { infinitif: "preisen", preterit: "pries", participe: "gepriesen", traduction: "louer/vanter" },
+                { infinitif: "quellen", preterit: "quoll", participe: "gequollen", traduction: "jaillir" },
+                { infinitif: "ringen", preterit: "rang", participe: "gerungen", traduction: "lutter" },
+                { infinitif: "rinnen", preterit: "rann", participe: "geronnen", traduction: "couler (goutte)" },
+                { infinitif: "saufen", preterit: "soff", participe: "gesoffen", traduction: "boire (animaux)" },
+                { infinitif: "saugen", preterit: "sog", participe: "gesogen", traduction: "sucer/aspirer" },
+                { infinitif: "schelten", preterit: "schalt", participe: "gescholten", traduction: "gronder" },
+                { infinitif: "scheren", preterit: "schor", participe: "geschoren", traduction: "tondre" },
+                { infinitif: "schinden", preterit: "schund", participe: "geschunden", traduction: "malmener" },
+                { infinitif: "schlingen", preterit: "schlang", participe: "geschlungen", traduction: "enlacer" },
+                { infinitif: "schwellen", preterit: "schwoll", participe: "geschwollen", traduction: "enfler" },
+                { infinitif: "schwinden", preterit: "schwand", participe: "geschwunden", traduction: "disparaître" },
+                { infinitif: "schwingen", preterit: "schwang", participe: "geschwungen", traduction: "balancer" },
+                { infinitif: "sinnen", preterit: "sann", participe: "gesonnen", traduction: "méditer" },
+                { infinitif: "speien", preterit: "spie", participe: "gespien", traduction: "cracher" },
+                { infinitif: "stieben", preterit: "stob", participe: "gestoben", traduction: "se disperser" },
+                { infinitif: "stinken", preterit: "stank", participe: "gestunken", traduction: "puer" },
+                { infinitif: "treiben", preterit: "trieb", participe: "getrieben", traduction: "pousser/conduire" },
+                { infinitif: "verbleichen", preterit: "verblich", participe: "verblichen", traduction: "pâlir" },
+                { infinitif: "verdrießen", preterit: "verdross", participe: "verdrossen", traduction: "contrarier" },
+                { infinitif: "verschleißen", preterit: "verschliss", participe: "verschlissen", traduction: "user" }
+            ]
+        };
+
+        // State management
+        let state = {
+            selectedLevels: [],
+            selectedAnswers: [],
+            currentVerb: null,
+            currentScore: 0,
+            currentTotal: 0,
+            verbStats: {}
+        };
+
+        // Load stats from localStorage
+        function loadStats() {
+            const saved = localStorage.getItem('germanVerbStats');
+            if (saved) {
+                state.verbStats = JSON.parse(saved);
+            }
+        }
+
+        // Save stats to localStorage
+        function saveStats() {
+            localStorage.setItem('germanVerbStats', JSON.stringify(state.verbStats));
+        }
+
+        // Initialize verb stats if not exists
+        function initVerbStats(verb) {
+            const key = verb.infinitif;
+            if (!state.verbStats[key]) {
+                state.verbStats[key] = {
+                    seen: 0,
+                    correct: 0,
+                    level: getVerbLevel(verb.infinitif)
+                };
+            }
+        }
+
+        // Get verb level
+        function getVerbLevel(infinitif) {
+            for (const [level, verbs] of Object.entries(verbsDatabase)) {
+                if (verbs.some(v => v.infinitif === infinitif)) {
+                    return level;
+                }
+            }
+            return 'Unknown';
+        }
+
+        // DOM Elements
+        const configArea = document.getElementById('config-area');
+        const quizArea = document.getElementById('quiz-area');
+        const statsArea = document.getElementById('stats-area');
+        const levelSelection = document.getElementById('level-selection');
+        const answerSelection = document.getElementById('answer-selection');
+        const startBtn = document.getElementById('start-btn');
+        const statsBtn = document.getElementById('stats-btn');
+        const resetStatsBtn = document.getElementById('reset-stats-btn');
+        const validateBtn = document.getElementById('validate-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const quitBtn = document.getElementById('quit-btn');
+        const backBtn = document.getElementById('back-btn');
+        const verbDisplay = document.getElementById('verb-display');
+        const verbInfo = document.getElementById('verb-info');
+        const answerInputs = document.getElementById('answer-inputs');
+        const feedback = document.getElementById('feedback');
+        const correctAnswer = document.getElementById('correct-answer');
+
+        // Event Listeners
+        levelSelection.addEventListener('click', (e) => {
+            const item = e.target.closest('.level-item');
+            if (item) {
+                item.classList.toggle('selected');
+                updateSelectedLevels();
+                updateStartButton();
+            }
+        });
+
+        answerSelection.addEventListener('click', (e) => {
+            const item = e.target.closest('.checkbox-item');
+            if (item && !item.classList.contains('disabled')) {
+                item.classList.toggle('selected');
+                updateSelectedAnswers();
+                updateStartButton();
+            }
+        });
+
+        startBtn.addEventListener('click', startQuiz);
+        statsBtn.addEventListener('click', showStats);
+        resetStatsBtn.addEventListener('click', resetStats);
+        validateBtn.addEventListener('click', validateAnswer);
+        nextBtn.addEventListener('click', nextQuestion);
+        quitBtn.addEventListener('click', quitQuiz);
+        backBtn.addEventListener('click', () => {
+            statsArea.style.display = 'none';
+            configArea.style.display = 'block';
+        });
+
+        function updateSelectedLevels() {
+            state.selectedLevels = Array.from(levelSelection.querySelectorAll('.level-item.selected'))
+                .map(item => item.dataset.level);
+        }
+
+        function updateSelectedAnswers() {
+            const selectedItems = answerSelection.querySelectorAll('.checkbox-item.selected');
+            state.selectedAnswers = Array.from(selectedItems).map(item => item.dataset.field);
+            
+            // Disable/enable items based on max 3 selection
+            const allItems = answerSelection.querySelectorAll('.checkbox-item');
+            allItems.forEach(item => {
+                if (state.selectedAnswers.length >= 3 && !item.classList.contains('selected')) {
+                    item.classList.add('disabled');
+                } else {
+                    item.classList.remove('disabled');
+                }
+            });
+        }
+
+        function updateStartButton() {
+            startBtn.disabled = state.selectedLevels.length === 0 || state.selectedAnswers.length === 0;
+        }
+
+        function startQuiz() {
+            state.currentScore = 0;
+            state.currentTotal = 0;
+            configArea.style.display = 'none';
+            quizArea.style.display = 'block';
+            updateScoreDisplay();
+            nextQuestion();
+        }
+
+        function getRandomVerb() {
+            const availableVerbs = [];
+            state.selectedLevels.forEach(level => {
+                availableVerbs.push(...verbsDatabase[level]);
+            });
+            return availableVerbs[Math.floor(Math.random() * availableVerbs.length)];
+        }
+
+        function nextQuestion() {
+            state.currentVerb = getRandomVerb();
+            initVerbStats(state.currentVerb);
+            
+            feedback.style.display = 'none';
+            correctAnswer.style.display = 'none';
+            validateBtn.style.display = 'block';
+            nextBtn.style.display = 'none';
+            
+            displayQuestion();
+        }
+
+        function displayQuestion() {
+            const verb = state.currentVerb;
+            const fieldsToHide = state.selectedAnswers;
+            const allFields = ['infinitif', 'preterit', 'participe', 'traduction'];
+            const visibleFields = allFields.filter(f => !fieldsToHide.includes(f));
+            
+            // Show verb level
+            const level = getVerbLevel(verb.infinitif);
+            verbDisplay.innerHTML = `<span style="color: #00d4ff;">Niveau ${level}</span>`;
+            
+            // Show visible fields
+            verbInfo.innerHTML = visibleFields.map(field => `
+                <div class="verb-item">
+                    <div class="verb-label">${getFieldLabel(field)}</div>
+                    <div class="verb-value">${verb[field]}</div>
+                </div>
+            `).join('');
+            
+            // Create input fields for hidden fields
+            answerInputs.innerHTML = fieldsToHide.map(field => `
+                <div class="input-group">
+                    <label class="input-label">${getFieldLabel(field)}</label>
+                    <input type="text" class="answer-input" data-field="${field}" 
+                           placeholder="Entrez ${getFieldLabel(field).toLowerCase()}" autocomplete="off">
+                </div>
+            `).join('');
+            
+            // Focus first input
+            const firstInput = answerInputs.querySelector('.answer-input');
+            if (firstInput) {
+                firstInput.focus();
+            }
+            
+            // Add enter key listener
+            answerInputs.querySelectorAll('.answer-input').forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        validateAnswer();
+                    }
+                });
+            });
+        }
+
+        function getFieldLabel(field) {
+            const labels = {
+                infinitif: 'Infinitif',
+                preterit: 'Prétérit (P1)',
+                participe: 'Participe (P2)',
+                traduction: 'Traduction'
+            };
+            return labels[field] || field;
+        }
+
+        function validateAnswer() {
+            const inputs = answerInputs.querySelectorAll('.answer-input');
+            let allCorrect = true;
+            const results = [];
+            
+            inputs.forEach(input => {
+                const field = input.dataset.field;
+                const userAnswer = input.value.trim().toLowerCase();
+                const correctValue = state.currentVerb[field].toLowerCase();
+                const isCorrect = userAnswer === correctValue;
+                
+                if (!isCorrect) allCorrect = false;
+                
+                results.push({
+                    field,
+                    userAnswer,
+                    correctValue,
+                    isCorrect
+                });
+                
+                input.disabled = true;
+                input.style.borderColor = isCorrect ? '#4ecdc4' : '#ff6b6b';
+                input.style.backgroundColor = isCorrect ? 'rgba(78, 205, 196, 0.2)' : 'rgba(255, 107, 107, 0.2)';
+            });
+            
+            // Update stats
+            state.currentTotal++;
+            const verbKey = state.currentVerb.infinitif;
+            state.verbStats[verbKey].seen++;
+            
+            if (allCorrect) {
+                state.currentScore++;
+                state.verbStats[verbKey].correct++;
+                feedback.textContent = '✅ Correct !';
+                feedback.className = 'feedback correct';
+            } else {
+                feedback.textContent = '❌ Incorrect';
+                feedback.className = 'feedback incorrect';
+                
+                // Show correct answers
+                correctAnswer.innerHTML = '<strong>Réponses correctes :</strong>' +
+                    results.filter(r => !r.isCorrect).map(r => `
+                        <div class="correct-answer-item">
+                            <span>${getFieldLabel(r.field)}: </span>
+                            <span class="your-answer">${r.userAnswer || '(vide)'}</span>
+                            <span> → </span>
+                            <span class="right-answer">${r.correctValue}</span>
+                        </div>
+                    `).join('');
+                correctAnswer.style.display = 'block';
+            }
+            
+            feedback.style.display = 'block';
+            validateBtn.style.display = 'none';
+            nextBtn.style.display = 'block';
+            
+            updateScoreDisplay();
+            saveStats();
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('current-score').textContent = state.currentScore;
+            document.getElementById('current-total').textContent = state.currentTotal;
+            const percent = state.currentTotal > 0 ? Math.round((state.currentScore / state.currentTotal) * 100) : 0;
+            document.getElementById('current-percent').textContent = percent + '%';
+            document.getElementById('progress-fill').style.width = percent + '%';
+        }
+
+        function quitQuiz() {
+            quizArea.style.display = 'none';
+            configArea.style.display = 'block';
+        }
+
+        function showStats() {
+            configArea.style.display = 'none';
+            statsArea.style.display = 'block';
+            
+            // Calculate global stats
+            let totalSeen = 0;
+            let totalCorrect = 0;
+            
+            Object.values(state.verbStats).forEach(stat => {
+                totalSeen += stat.seen;
+                totalCorrect += stat.correct;
+            });
+            
+            document.getElementById('global-seen').textContent = totalSeen;
+            document.getElementById('global-correct').textContent = totalCorrect;
+            const globalPercent = totalSeen > 0 ? Math.round((totalCorrect / totalSeen) * 100) : 0;
+            document.getElementById('global-percent').textContent = globalPercent + '%';
+            
+            // Create level tabs
+            const levelTabs = document.getElementById('level-tabs');
+            levelTabs.innerHTML = Object.keys(verbsDatabase).map((level, index) => `
+                <div class="tab ${index === 0 ? 'active' : ''}" data-level="${level}">${level}</div>
+            `).join('');
+            
+            // Add tab click listeners
+            levelTabs.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    levelTabs.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    displayVerbStats(tab.dataset.level);
+                });
+            });
+            
+            // Display first level stats
+            displayVerbStats('A1');
+        }
+
+        function displayVerbStats(level) {
+            const container = document.getElementById('verb-stats-container');
+            const verbs = verbsDatabase[level];
+            
+            let html = `
+                <table class="verb-stats-table">
+                    <thead>
+                        <tr>
+                            <th>Verbe</th>
+                            <th>Vu</th>
+                            <th>Réussite</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            verbs.forEach(verb => {
+                const stats = state.verbStats[verb.infinitif] || { seen: 0, correct: 0 };
+                const percent = stats.seen > 0 ? Math.round((stats.correct / stats.seen) * 100) : 0;
+                const rateClass = percent >= 70 ? 'high' : (percent >= 40 ? 'medium' : 'low');
+                
+                html += `
+                    <tr>
+                        <td>${verb.infinitif}</td>
+                        <td>${stats.seen}</td>
+                        <td><span class="success-rate ${stats.seen > 0 ? rateClass : ''}">${stats.seen > 0 ? percent + '%' : '-'}</span></td>
+                    </tr>
+                `;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function resetStats() {
+            if (confirm('Êtes-vous sûr de vouloir réinitialiser toutes les statistiques ?')) {
+                state.verbStats = {};
+                saveStats();
+                alert('Statistiques réinitialisées !');
+            }
+        }
+
+        // Initialize
+        loadStats();
+    </script>
+</body>
+</html>
